@@ -45,7 +45,11 @@ tags:
 
   $E=mc^{2}$
 
-  $$x+y=z\tag{1.1}$$    
+  $$x+y=z\tag{1.1}$$
+
+  \[x + y = z\]    
+  \(x + y = z\)
+  
   结束文字
 
 ### 表格
@@ -91,3 +95,17 @@ print("test case of python")
 ### HTML
 <kbd>F5</kbd> <kbd>Alt</kbd>
 
+[Terms, Grammarly]
+
+$$
+\begin{aligned}
+t \Coloneqq & & (terms) \\
+    & \mathtt{true} & (constant\ true) \\
+    & \mathtt{false} & (constant\ false) \\
+    & \mathtt{if}\ t\ \mathtt{then}\ t\ \mathtt{else}\ t & (conditions) \\
+    & \mathtt{0} & (constant\ 0) \\
+    & \mathtt{succ}\ t & (successor) \\
+    & \mathtt{pred}\ t & (predecessor) \\
+    & \mathtt{iszero}\ t & (zero\ test)
+\end{aligned}
+$$
