@@ -2,8 +2,8 @@
 title: Roger Blog
 SEOTitle: Roger的博客 | Roger Blog | renjie-github Blog
 header-img: img/home-bg.jpg
-email: rj@gmail.com
-description: "开始写博客"
+email: renjie_sjtu@126.com
+description: "关于机器学习等的一些技术分享 | Roger，Machine Learning Engineer | 这里是 Roger 的个人博客，与你一起发现更大的世界。"
 keyword: "ML RL"
 url: "https://renjie-github.github.io"              # your host, for absolute URL
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
@@ -15,7 +15,7 @@ future: true
 RSS: false
 #weibo_username:     huxpro
 #zhihu_username:     huxpro
-# github_username:    renjie-github
+github_username:    renjie-github
 #twitter_username:   huxpro
 #facebook_username:  huxpro
 #linkedin_username:  firstname-lastname-idxxxx
@@ -59,7 +59,7 @@ kramdown:
 
 
 # Disqus settings
-disqus_username: hux
+#disqus_username: renjie-github
 
 # Netease settings
 netease_comment: false
