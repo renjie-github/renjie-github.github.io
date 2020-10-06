@@ -45,7 +45,7 @@ tags:
 
   $E=mc^{2}$
 
-  $$x+y=z\tag{1.1}$$
+  $x+y=z\tag{1.1}$
 
   \[x + y = z\]    
   \(x + y = z\)
@@ -94,5 +94,3 @@ print("test case of python")
 
 ### HTML
 <kbd>F5</kbd> <kbd>Alt</kbd>
-
-$$ (b_{n - 1}b_{n - 2}\dots b_1 b_0)b = \sum{i = 0}^{n - 1} b_i \times b^i。 $$
