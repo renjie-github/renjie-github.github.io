@@ -78,7 +78,7 @@ netease_comment: false
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "待修改<br>待修改"
+sidebar-about-description: "开始下一段旅程<br>On my way..."
 sidebar-avatar: /img/roger-github.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
