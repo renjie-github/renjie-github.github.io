@@ -21,7 +21,7 @@ $Q_{target}(s,a)\leftarrow r+\gamma max_{a'\in A}Q(s',a')\tag{1}\label{eq1}$
 <img src="/img/RL/DQN-variant-theorem.jpg" width=500 height=500 div align=center />  
 &emsp;&emsp;与经典DQN的区别是：使用online network来评估贪心策略（进行动作选择），使用目标网络来估计值（进行值估计）。所以，Double DQN的目标Q值计算公式变为：  
 $Q_{target}(s,a)\leftarrow r+\gamma Q(s', argmax_{a}(s',\theta_t),\theta_{t}^{-})\tag{2}$  
-&emsp;&emsp;上式中$\theta_{t}^{-}$是target网络的参数，$\theta_{t}$是当前online网络的参数。对应的TensorFlow代码实现为
+&emsp;&emsp;上式中$\theta_{t}^{-}$是target网络的参数，$\theta_{t}$是当前online网络的参数。对应的[TensorFlow代码实现](https://github.com/renjie-github/RLToolKit/blob/main/DoubleDQN.ipynb)为
 ```python
 import tensorflow as tf
 
