@@ -37,4 +37,23 @@ $L_i = \mathbb E[((r+\gamma max_{a'}Q(s',a';\theta_i^-))-Q(s,a;\theta_i))^2]\tag
 &emsp;&emsp;作者还发现将误差项$r+\gamma max_{a'}Q(s',a';\theta_i^-)-Q(s,a;\theta_i)$裁剪到(-1, 1)的范围内可提高算法稳定性。因为绝对值损失函数$\|x\|$对于有负值的$x$导数为-1，正值$x$导数为1。对误差项进行裁剪等效于：对超过(-1, 1)范围的误差使用绝对值损失函数。**[P.S.]这里类似于深度学习损失函数中huber loss的作用，减少了异常值的影响，避免了过大的参数更新**。  
 &emsp;&emsp;完整的DQN算法如下：  
 <img src="/img/RL/DQN_algo.jpg" width=600 height=700 div align=center />  
+&emsp;&emsp;[该算法的tensorflow实现](https://github.com/renjie-github/RLToolKit/blob/main/DQN.ipynb)，关键更新部分代码如下：  
+```python
+import tensorflow as tf
+
+def train_on_batch(self, states, actions, rewards, next_states, dones):
+    actions = tf.cast(actions, dtype=tf.uint8)
+    next_Q_values = self.model_target(next_states)
+    # using target network to calculate target Q values        
+    target_Q_values = rewards + (1 - dones) * self.gamma * tf.reduce_max(next_Q_values, axis=-1, keepdims=True)
+
+    # using one-hot operation to mask out irrelavant Q values
+    mask = tf.squeeze(tf.one_hot(actions, depth=2, dtype=tf.float32))
+    with tf.GradientTape() as tape:
+        Q_values_ = self.model(states)
+        Q_values = tf.reduce_sum(Q_values_ * mask, axis=1, keepdims=True)
+        loss = tf.reduce_mean(tf.keras.losses.MSE(target_Q_values, Q_values))
+    gradients = tape.gradient(loss, self.model.trainable_variables)
+    self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+```
 
