@@ -78,7 +78,7 @@ ba_track_id: 6c7792a4c2c09eec289f034ae36d045a
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "开始下一段旅程<br>On my way..."
+sidebar-about-description: "开始下一段旅程<br>On my way...<br>微信公众号：机器学习算法之路"
 sidebar-avatar: /img/roger-github.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
