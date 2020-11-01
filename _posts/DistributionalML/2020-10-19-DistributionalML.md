@@ -3,7 +3,7 @@ layout: post
 title: "分布式机器学习"
 subtitle: "Distributional Machine Learning"
 author: "Roger"
-header-img: "img/post-create-blog.jpg"
+header-img: "img/distributed_ML.png"
 header-mask: 0.4
 mathjax: true
 tags:
