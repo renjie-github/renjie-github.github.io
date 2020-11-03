@@ -41,7 +41,11 @@ tags:
 
 - 行间公式
 
-  貌似双$符不起作用$$\t_{0}$$，仍以行内形式实现
+\begin{equation}
+\begin{aligned}
+V(s_t;\theta)=\sum_{a}\pi(a|s_t;\theta)\cdot Q_\pi(s_t,a)
+\end{aligned}
+\end{equation}
 
   $E=mc^{2}$
 
