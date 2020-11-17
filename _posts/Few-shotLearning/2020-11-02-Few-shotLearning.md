@@ -7,7 +7,7 @@ header-img: "img/distributed_ML.png"
 header-mask: 0.4
 mathjax: true
 tags:
-  - ML
+  - Few-Shot Learning
 ---
 
 ## 少样本学习简介
