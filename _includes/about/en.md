@@ -1,10 +1,10 @@
 > Your time is limited, so don’t waste it living someone else’s life. 
 
-Hi, I'm Roger, a Machine Learning engineer...
+Hi, I'm Roger, a Machine Learning engineer. My current work content is about search science.
 
 ##### [My Area (🚧)]
 
-ML, RL, Time series...
+RL, Time series, NLP...
 
 ##### My Share
 

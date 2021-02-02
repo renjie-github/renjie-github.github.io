@@ -7,7 +7,7 @@ header-img: "img/distributed_ML.png"
 header-mask: 0.4
 mathjax: true
 tags:
-  - ML
+  - Distributed System
 ---
 
 ## 为什么要并行
