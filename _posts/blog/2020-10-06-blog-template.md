@@ -51,10 +51,19 @@ V(s_t;\theta)=\sum_{a}\pi(a|s_t;\theta)\cdot Q_\pi(s_t,a)
 
   $x+y=z\tag{1.1}$
 
-  \[x + y = z\]    
-  \(x + y = z\)
-  
   结束文字
+
+- 矩阵  
+  $$
+  \left(\begin{array}{cc} 
+  0.8944272 & 0.4472136\\
+  -0.4472136 & -0.8944272
+  \end{array}\right)
+  \left(\begin{array}{cc} 
+  10 & 0\\ 
+  0 & 5
+  \end{array}\right)
+  $$ 
 
 ### 表格
 
