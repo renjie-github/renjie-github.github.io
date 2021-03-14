@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "系统进程及资源管理"
+title: "Linux之：系统进程及资源管理，计划任务"
 subtitle: "common commands"
 author: "Roger"
 header-img: "img/Linux/process_management.png"
