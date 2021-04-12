@@ -3,7 +3,7 @@ layout: post
 title: "Tour of Scala"
 subtitle: "学习笔记"
 author: "Roger"
-header-img: "img/BigData/Scala.png"
+header-img: "img/BigData/Scala.jpg"
 header-mask: 0.4
 mathjax: true
 tags:
