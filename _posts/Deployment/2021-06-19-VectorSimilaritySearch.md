@@ -3,7 +3,7 @@ layout: post
 title: "向量检索方法汇总"
 subtitle: "Vector Similarity Search"
 author: "Roger"
-header-img: "img/post-create-blog.jpg"
+header-img: "img/Deployment/vector-sim-search.jpg"
 header-mask: 0.4
 mathjax: true
 tags:
