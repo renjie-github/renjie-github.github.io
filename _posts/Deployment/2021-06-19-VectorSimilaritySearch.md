@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "向量检索方法汇总"
+title: "向量相似度查找方法汇总"
 subtitle: "Vector Similarity Search"
 author: "Roger"
 header-img: "img/Deployment/vector-sim-search.jpg"
