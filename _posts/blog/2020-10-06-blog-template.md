@@ -80,6 +80,11 @@ V(s_t;\theta)=\sum_{a}\pi(a|s_t;\theta)\cdot Q_\pi(s_t,a)
 * 插入本地图片
 ![本地图片](/img/404-bg.jpg)
 
+<p align="center">
+  <img src=/img/404-bg.jpg alt="async data loading" width="400", height="300" />
+</p>
+
+
 * 插入base64编码
   
   ![编码图片][引用内容]
