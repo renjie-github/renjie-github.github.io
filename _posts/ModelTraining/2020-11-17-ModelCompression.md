@@ -3,11 +3,12 @@ layout: post
 title: "模型压缩"
 subtitle: "Model Compression"
 author: "Roger"
-header-img: "img/ModelCompression/model_compression.jpg"
+header-img: "img/ModelTraining/model_compression.jpg"
 header-mask: 0.4
 mathjax: true
 tags:
-  - Model Compression
+  - Model Training
+  - Deployment
 ---
 
 ## 模型压缩简介  
@@ -29,7 +30,7 @@ tags:
 ## 2. 知识蒸馏
 &emsp;&emsp;该方法是先训练一个大的神经网络来学习任务，在此基础上再训练一个小的网络来“模仿”该大网络的行为。即给定相同的输入，小网络要模仿大网络的输出。这与直接使用数据标签进行训练的区别是：以多分类任务为例，数据标签只能提供单一的信息（是否是该类），无法提供更详细的类与类之间的关系。而大网络不是只输出单个结果，而是输出一个分布，有助于小网络从中学到更丰富的信息。  
 &emsp;&emsp;一个有用的trick：Temperature：  
-![Temperature](/img/ModelCompression/Temperature.jpg)  
+![Temperature](/img/ModelTraining/Temperature.jpg)  
 ## 3. 参数量化  
 - 使用更少的bit来表示一个值，如float32变为float16
 - 权值聚类  
@@ -40,8 +41,8 @@ tags:
 ## 4. 网络结构设计
 &emsp;&emsp;对于全连接层网络，假设原网络是由两层Dense层连接组成，两层neuron数分别为$m$、$n$，此时在两层中间再插入一层neuron数为$k$（$k \lt min(m, n)$）的Dense层。那么之前两层之间的参数大小为$m\cdot n$，插入后参数大小变为$m\cdot k+n\cdot k=k\cdot (m+n)$。k选择较小可以使整体参数变小，但同时网络的表达能力也变弱。  
 &emsp;&emsp;对于卷积网络，用Depthwise Seperable（Depthwise Convolution + Pointwise Convolution）来代替普通的卷积网络。  
-![VanillaConv](/img/ModelCompression/vanillaConv.jpg "Vanilla CNN")   
-![DepthwiseConv](/img/ModelCompression/depthwiseSeperableConv.jpg "Depthwise Seperable CNN") 
+![VanillaConv](/img/ModelTraining/vanillaConv.jpg "Vanilla CNN")   
+![DepthwiseConv](/img/ModelTraining/depthwiseSeperableConv.jpg "Depthwise Seperable CNN") 
 
 ## 5. 动态计算
 &emsp;&emsp;在网络电量低或者计算资源不足时，不使用整个网络得出预测结果，而是使用部分网络给出预测结果。比如对于多个Dense层堆叠的网络，在每个（或每几个）层上都加上结果的输出，这样在有需要时，可以只用网络的低层输出的结果作为预测结果，从而减少计算量。  

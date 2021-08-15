@@ -8,6 +8,7 @@ header-mask: 0.4
 mathjax: true
 tags:
   - Distributed System
+  - Deployment
 ---
 
 ## 为什么要并行
