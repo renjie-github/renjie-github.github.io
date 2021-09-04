@@ -3,7 +3,7 @@ layout: post
 title: "模型训练性能调优笔记"
 subtitle: ""
 author: "Roger"
-header-img: "img/post-create-blog.jpg"
+header-img: "img/ModelTraining/model_training_optimization.jpg"
 header-mask: 0.4
 mathjax: true
 tags:
