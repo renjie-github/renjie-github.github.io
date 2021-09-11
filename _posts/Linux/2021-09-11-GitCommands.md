@@ -3,7 +3,7 @@ layout: post
 title: "Git常用命令"
 subtitle: "Git common commands"
 author: "Roger"
-header-img: "img/post-create-blog.jpg"
+header-img: "img/Linux/git_commands.png"
 header-mask: 0.4
 mathjax: true
 tags:
