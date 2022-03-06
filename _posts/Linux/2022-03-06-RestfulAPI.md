@@ -3,7 +3,7 @@ layout: post
 title: "REST API"
 subtitle: "concepts"
 author: "Roger"
-header-img: "img/Linux/git_commands.png"
+header-img: "img/Linux/restful_api.png"
 header-mask: 0.4
 mathjax: true
 tags:
