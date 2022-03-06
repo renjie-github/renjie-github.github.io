@@ -43,7 +43,8 @@ tags:
   - 导出dependency `pip3 freeze > requirements.txt`
 - 创建app文件
   - `touch application.py`
-  - 编写代码  
+  - 编写代码
+
   ```Python
   from flask import Flask
   app = Flask(__name__)
@@ -55,7 +56,8 @@ tags:
   - 测试app运行
     - 设置环境变量`export FLASK_APP=application.py`以及`FLASK_ENV=development`
     - 启动app `flask run`
-  - 添加逻辑    
+  - 添加逻辑
+   
   ```Python
   from flask import Flask
   app = Flask(__name__)
