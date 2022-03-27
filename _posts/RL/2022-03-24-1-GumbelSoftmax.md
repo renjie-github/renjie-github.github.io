@@ -52,7 +52,7 @@ $$
 ![reparameterization](/img/VAE/reparameterization_1.jpg "VAE Network") 
 &emsp;&emsp;图中有一个采样操作（对应计算图中的sampling node），而无法通过sampling node做梯度的反向传播。Reparameterization trick就是为了解决这一问题，它将latent vector $z$看做：
 $$
-z=\mu+\sigma\odot\epsilon,\;where \epsilon\sim Normal(0, 1)
+z=\mu+\sigma\odot\epsilon,\;where \epsilon\sim Normal(0, 1) \tag{4}
 $$  
 其中$\mu$和$\sigma$是要学习的参数，$\epsilon$是引入的随机部分，它服从标准正态分布。通过这一步，可以使梯度顺畅地反向传播到要学习的参数$\mu$和$\sigma$，而$\epsilon$对应的是一个固定的stochastic node，我们不需要对它求导也不会改变它的参数，所以无所谓该node是否做sampling操作。如下图所示：
 ![reparameterization](/img/VAE/reparameterization_2.jpg "VAE Network") 
