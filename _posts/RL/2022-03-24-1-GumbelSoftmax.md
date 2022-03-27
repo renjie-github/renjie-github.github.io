@@ -3,12 +3,12 @@ layout: post
 title: "Gumbel-Softmax"
 subtitle: "可微的离散变量采样"
 author: "Roger"
-header-img: "img/RL.jpg"
+header-img: "img/VAE/GumbelSoftmax.jpg"
 header-mask: 0.4
 mathjax: true
 tags:
   - RL
-  - DL
+  - VAE
 ---
 
 # 介绍
