@@ -3,7 +3,7 @@ layout: post
 title: "Transformer模型优化及加速概览"
 subtitle: ""
 author: "Roger"
-header-img: "/img/NLP/Taxonomy_of_Transformer_models.jpg"
+header-img: "img/NLP/Taxonomy_of_Transformer_models.jpg"
 header-mask: 0.4
 mathjax: true
 tags:
