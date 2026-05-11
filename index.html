@@ -1,6 +1,6 @@
 ---
 layout: default
-description: "Applied Researcher II at eBay"
+description: "Researcher focused on language and vision-language models, multimodal retrieval, and large-scale AI systems"
 permalink: /
 no-catalog: true
 ---
@@ -13,7 +13,6 @@ no-catalog: true
         <div class="profile-hero__content">
             <p class="profile-kicker">{{ profile.location }}</p>
             <h1>{{ profile.name }}</h1>
-            <p class="profile-title">{{ profile.role }} · {{ profile.company }}</p>
             <p class="profile-lead">{{ profile.summary }}</p>
             <div class="profile-actions" aria-label="Contact links">
                 <a href="mailto:{{ profile.email }}">Email</a>
@@ -63,19 +62,6 @@ no-catalog: true
     </section>
 
     <section class="profile-section">
-        <div class="profile-section__label">Work Themes</div>
-        <div class="profile-section__body">
-            {% for work in profile.selected_work %}
-            <article class="profile-work">
-                <h2>{{ work.name }}</h2>
-                <p>{{ work.scope }}</p>
-                <p class="profile-impact">{{ work.impact }}</p>
-            </article>
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="profile-section">
         <div class="profile-section__label">Education</div>
         <div class="profile-section__body">
             {% for edu in profile.education %}
@@ -88,6 +74,19 @@ no-catalog: true
                     <time>{{ edu.period }}</time>
                     <p>{{ edu.note }}</p>
                 </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <div class="profile-section__label">Work Themes</div>
+        <div class="profile-section__body">
+            {% for work in profile.selected_work %}
+            <article class="profile-work">
+                <h2>{{ work.name }}</h2>
+                <p>{{ work.scope }}</p>
+                <p class="profile-impact">{{ work.impact }}</p>
             </article>
             {% endfor %}
         </div>
@@ -110,10 +109,6 @@ no-catalog: true
             <div class="profile-skill-block">
                 <strong>Core domains</strong>
                 <p>{{ profile.skills.core | join: " · " }}</p>
-            </div>
-            <div class="profile-skill-block">
-                <strong>Frameworks &amp; tools</strong>
-                <p>{{ profile.skills.tools | join: " · " }}</p>
             </div>
         </div>
     </section>

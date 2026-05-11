@@ -1,20 +1,18 @@
 name: "Jie Ren"
-role: "Applied Researcher II"
-company: "eBay"
 location: "Shanghai, China"
 email: "renjie_sjtu@126.com"
 website: "https://renjie-github.github.io/"
 summary: >-
-  Applied researcher focused on vision-language models, multimodal retrieval,
-  NLP, and large-scale machine learning systems for search and e-commerce.
-  I work across data construction, model training and alignment, vector
-  retrieval, and production system integration.
+  Researcher focused on language and vision-language models, multimodal
+  retrieval, and large-scale AI systems for search and e-commerce. Experienced
+  in foundation model training and alignment, representation learning, vector
+  retrieval, and production-scale deployment.
 focus:
+  - "Language Models"
   - "Vision-Language Models"
   - "Multimodal Retrieval"
-  - "NLP"
-  - "Large-scale ML Systems"
-  - "Search Science"
+  - "Large-scale AI Systems"
+  - "Search & E-commerce"
 highlights:
   - "Built production-grade multimodal and generative AI systems for e-commerce search, item understanding, and listing quality."
   - "Experienced across the full applied research loop: problem framing, data construction, model training, evaluation, retrieval, inference, and system integration."
@@ -49,11 +47,11 @@ selected_work:
     scope: "Trained semantic item retrieval models using business-oriented datasets and hard-negative strategies."
     impact: "Strengthened recall quality for sparse and low-result search scenarios."
 education:
-  - school: "Graduate Education"
+  - school: "Shanghai Jiao Tong University"
     degree: "M.S. in Electronic Science and Technology"
     period: "Sep 2015 - Mar 2018"
     note: "National-level scholarship; strong academic standing"
-  - school: "Undergraduate Education"
+  - school: "Harbin Institute of Technology"
     degree: "B.E. in Electromagnetic Field and Wireless Technology"
     period: "Sep 2011 - Jul 2015"
     note: "Strong academic standing"
@@ -62,19 +60,11 @@ publications:
   - "Multiple patent contributions related to search and multimodal data processing"
 skills:
   core:
+    - "Language Models"
     - "Vision-Language Models"
-    - "Natural Language Processing"
     - "Multimodal Learning"
-    - "Reinforcement Learning"
     - "Vector Retrieval"
-    - "Time Series Forecasting"
-  tools:
-    - "PyTorch"
-    - "TensorFlow"
-    - "Ray"
-    - "Apache Spark"
-    - "vLLM"
-    - "NVIDIA DALI"
-    - "Triton Inference Server"
-    - "TensorRT"
-    - "HNSW"
+    - "Representation Learning"
+    - "Foundation Model Training"
+    - "Preference Alignment"
+    - "Production AI Systems"
