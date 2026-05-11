@@ -2,7 +2,7 @@
 layout: post
 title: "强化学习之——算法分类"
 subtitle: "Algorithm Classification"
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/RL.jpg"
 header-mask: 0.4
 mathjax: true

@@ -1,46 +1,120 @@
 ---
-layout: page
-description: "让时光有力量"
+layout: default
+description: "Applied Researcher II at eBay"
+permalink: /
+no-catalog: true
 ---
 
-{% for post in paginator.posts %}
-<div class="post-preview">
-    <a href="{{ post.url | prepend: site.baseurl }}">
-        <h2 class="post-title">
-            {{ post.title }}
-        </h2>
-        {% if post.subtitle %}
-        <h3 class="post-subtitle">
-            {{ post.subtitle }}
-        </h3>
-        {% endif %}
-        <div class="post-content-preview">
-            {% if post.lang == 'en' %}
-                {{ post.content | strip_html | truncate:300 }}
-            {% else %}
-                {{ post.content | strip_html | truncate:200 }}
-            {% endif %}
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by {% if post.author %}{{ post.author }}{% else %}{{ site.title }}{% endif %} on {{ post.date | date: "%B %-d, %Y" }}
-    </p>
-</div>
-<hr>
-{% endfor %}
+{% assign profile = site.data.profile %}
 
-<!-- Pager -->
-{% if paginator.total_pages > 1 %}
-<ul class="pager">
-    {% if paginator.previous_page %}
-    <li class="previous">
-        <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&larr; Newer Posts</a>
-    </li>
-    {% endif %}
-    {% if paginator.next_page %}
-    <li class="next">
-        <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Older Posts &rarr;</a>
-    </li>
-    {% endif %}
-</ul>
-{% endif %}
+<header class="intro-header profile-hero" style="background-image: url('{{ site.baseurl }}/{{ site.header-img }}')">
+    <div class="profile-hero__shade"></div>
+    <div class="container">
+        <div class="profile-hero__content">
+            <p class="profile-kicker">{{ profile.location }}</p>
+            <h1>{{ profile.name }}</h1>
+            <p class="profile-title">{{ profile.role }} · {{ profile.company }}</p>
+            <p class="profile-lead">{{ profile.summary }}</p>
+            <div class="profile-actions" aria-label="Contact links">
+                <a href="mailto:{{ profile.email }}">Email</a>
+                <a href="{{ site.baseurl }}/blog/">Blog</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="profile-main">
+    <section class="profile-section profile-section--intro">
+        <div class="profile-section__label">Focus</div>
+        <div class="profile-focus-list">
+            {% for item in profile.focus %}
+            <span>{{ item }}</span>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <div class="profile-section__label">Highlights</div>
+        <div class="profile-section__body">
+            <ul class="profile-clean-list">
+                {% for item in profile.highlights %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <div class="profile-section__label">Experience</div>
+        <div class="profile-section__body">
+            {% for job in profile.experience %}
+            <article class="profile-row">
+                <div>
+                    <h2>{{ job.role }}</h2>
+                    <p>{{ job.company }} · {{ job.location }}</p>
+                </div>
+                <div>
+                    <time>{{ job.period }}</time>
+                    <p>{{ job.summary }}</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <div class="profile-section__label">Work Themes</div>
+        <div class="profile-section__body">
+            {% for work in profile.selected_work %}
+            <article class="profile-work">
+                <h2>{{ work.name }}</h2>
+                <p>{{ work.scope }}</p>
+                <p class="profile-impact">{{ work.impact }}</p>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <div class="profile-section__label">Education</div>
+        <div class="profile-section__body">
+            {% for edu in profile.education %}
+            <article class="profile-row profile-row--compact">
+                <div>
+                    <h2>{{ edu.school }}</h2>
+                    <p>{{ edu.degree }}</p>
+                </div>
+                <div>
+                    <time>{{ edu.period }}</time>
+                    <p>{{ edu.note }}</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <div class="profile-section__label">Research</div>
+        <div class="profile-section__body">
+            <ul class="profile-clean-list">
+                {% for item in profile.publications %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <div class="profile-section__label">Skills</div>
+        <div class="profile-section__body">
+            <div class="profile-skill-block">
+                <strong>Core domains</strong>
+                <p>{{ profile.skills.core | join: " · " }}</p>
+            </div>
+            <div class="profile-skill-block">
+                <strong>Frameworks &amp; tools</strong>
+                <p>{{ profile.skills.tools | join: " · " }}</p>
+            </div>
+        </div>
+    </section>
+</main>

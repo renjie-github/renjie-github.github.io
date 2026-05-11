@@ -2,7 +2,7 @@
 layout: post
 title: "模型压缩"
 subtitle: "Model Compression"
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/ModelTraining/model_compression.jpg"
 header-mask: 0.4
 mathjax: true
@@ -40,9 +40,9 @@ tags:
 
 ## 4. 网络结构设计
 &emsp;&emsp;对于全连接层网络，假设原网络是由两层Dense层连接组成，两层neuron数分别为$m$、$n$，此时在两层中间再插入一层neuron数为$k$（$k \lt min(m, n)$）的Dense层。那么之前两层之间的参数大小为$m\cdot n$，插入后参数大小变为$m\cdot k+n\cdot k=k\cdot (m+n)$。k选择较小可以使整体参数变小，但同时网络的表达能力也变弱。  
-&emsp;&emsp;对于卷积网络，用Depthwise Seperable（Depthwise Convolution + Pointwise Convolution）来代替普通的卷积网络。  
+&emsp;&emsp;对于卷积网络，用Depthwise Separable Convolution（Depthwise Convolution + Pointwise Convolution）来代替普通的卷积网络。  
 ![VanillaConv](/img/ModelTraining/vanillaConv.jpg "Vanilla CNN")   
-![DepthwiseConv](/img/ModelTraining/depthwiseSeperableConv.jpg "Depthwise Seperable CNN") 
+![DepthwiseConv](/img/ModelTraining/depthwiseSeperableConv.jpg "Depthwise Separable CNN") 
 
 ## 5. 动态计算
 &emsp;&emsp;在网络电量低或者计算资源不足时，不使用整个网络得出预测结果，而是使用部分网络给出预测结果。比如对于多个Dense层堆叠的网络，在每个（或每几个）层上都加上结果的输出，这样在有需要时，可以只用网络的低层输出的结果作为预测结果，从而减少计算量。  

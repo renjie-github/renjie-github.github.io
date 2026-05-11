@@ -2,7 +2,7 @@
 layout: post
 title: "Transformer家族模型总结"
 subtitle: "Transformer's family"
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/NLP/Transformers.jpg"
 header-mask: 0.4
 mathjax: true
@@ -15,15 +15,15 @@ tags:
 &emsp;&emsp;传统的序列模型对于序列很长的情况，很难避免“遗忘”的问题。这一“遗忘”是由梯度随时间反向传播（Back propagation through time）造成的，序列中越“久远”的元素，其梯度贡献占比越少。且序列越长，遗忘现象越严重。  
 &emsp;&emsp;2015年ICLR上[attention](https://arxiv.org/abs/1409.0473)的提出可以用来避免“遗忘”问题，随之的代价是算法复杂度的上升。Transformer是attention的集大成者，其完全抛弃了RNN，单纯使用attention来做序列处理并达到了远超传统序列模型的SOTA。笔者认为，可以将attention看做是改良版的memory cell，以一种更直接的方式来保存历史信息。  
 ## Transformer模型介绍
-&emsp;&emsp;Transforme于2017年NIPS的[Attention Is All You Need](https://arxiv.org/abs/1706.03762)提出。Transformer是Encoder和Decoder两部分组成的Seq2Seq模型，仅由attention和全连接层组成。由于没有RNN结构，使得算法实现更容易并行，从而实现更高的计算效率。  
+&emsp;&emsp;Transformer于2017年NIPS的[Attention Is All You Need](https://arxiv.org/abs/1706.03762)提出。Transformer是Encoder和Decoder两部分组成的Seq2Seq模型，仅由attention和全连接层组成。由于没有RNN结构，使得算法实现更容易并行，从而实现更高的计算效率。  
 ### 1. Positional Encoding
 &emsp;&emsp;Transformer舍弃了RNN中的recurrence机制以支持multi-head self-attention机制，这使得训练过程得到大幅加速。然而，由于序列中的每个word同时进入模型（Encoder和Decoder），模型无法分辨序列中word的位置信息。位置信息是有用的，比如对于因果、前后顺序等场景。为此，需要人为加入位置信息。Transformer中采用了positional encoding这一方法，这一方法的好处在于：（1）可以适应测试数据比训练数据还长的场景，即位置信息编码不受限于具体场景，且不要求训练数据覆盖任何句子长度；（2）可以反映出相对位置的一致性，即间隔特定word数的词段哪怕从句首换到句尾，它们之间的相对位置是不变的；（3）值的取值范围是有界的；（4）每个位置的值是确定性的。  
 &emsp;&emsp;作者使用了不同频率的sine和cosine函数来实现位置编码：  
 $$
-PE_{pos,2i}=sin(pos/10000^{2i/d_{model}}) \\
-PE_{pos,2i+1}=sin(pos/10000^{2i/d_{model}}) \tag{1}
+PE_{pos,2i}=\sin(pos/10000^{2i/d_{model}}) \\
+PE_{pos,2i+1}=\cos(pos/10000^{2i/d_{model}}) \tag{1}
 $$  
-&emsp;&emsp;上式中$d_{model}=512$为输入embedding的维度。$i$的取值范围是$[0,\cdots,d_{model}/2)$，对每个位置，都会生成一个$d_{model}$维的postional encoding。官方代码实现：  
+&emsp;&emsp;上式中$d_{model}=512$为输入embedding的维度。$i$的取值范围是$[0,\cdots,d_{model}/2)$，对每个位置，都会生成一个$d_{model}$维的positional encoding。官方代码实现：  
 
 ```python
 import numpy as np
@@ -33,7 +33,7 @@ import tensorflow as tf
 def get_angles(pos, i, d_model):
     # pos: (position, 1), angle_rates: (1, d_model)
     angle_rates = 1 / np.power(10000, (2 * (i // 2)) / np.float32(d_model))
-    return pos * angles_rates # (position, d_model)
+    return pos * angle_rates # (position, d_model)
 
 def positional_encoding(position, d_model):
     angle_rads = get_angles(np.arange(position)[:, np.newaxis],
@@ -53,7 +53,7 @@ def positional_encoding(position, d_model):
 
 ### 2. Attention在Seq2Seq中的应用
 &emsp;&emsp;在RNN组成的Seq2Seq模型中，假设序列长度为m：
-- Encoder部分：对于每个时间步输入的$\boldsymbol{x}_i$，都会产生一个状态向量$\boldsymbol{h}_i$。一开始，该状态向量被初始化为$\boldsymbol{h}_0=\boldsymbol{0}$。在下一个时间步，通过某种运算，利用前一个时间步产生的$$\boldsymbol{h}_{t-1}$$与当前时间步的输入$\boldsymbol{x}_t$生成新的状态向量$\boldsymbol{h}_t$。重复上述步骤直至m个序列全部输入完成，得到一共m个状态向量$\boldsymbol{h}_1\sim \boldsymbol{h}_m$
+- Encoder部分：对于每个时间步输入的$\boldsymbol{x}_i$，都会产生一个状态向量$\boldsymbol{h}_i$。一开始，该状态向量被初始化为$\boldsymbol{h}_0=\boldsymbol{0}$。在下一个时间步，通过某种运算，利用前一个时间步产生的$\boldsymbol{h}_{t-1}$与当前时间步的输入$\boldsymbol{x}_t$生成新的状态向量$\boldsymbol{h}_t$。重复上述步骤直至m个序列全部输入完成，得到一共m个状态向量$\boldsymbol{h}_1\sim \boldsymbol{h}_m$
   >得到$\boldsymbol{h}_t$的计算方式为：  
     $$
     \boldsymbol{h}_t = \boldsymbol{v}^T\cdot\rm{tanh}\left(W \cdot  
@@ -62,7 +62,7 @@ def positional_encoding(position, d_model):
     \boldsymbol{x}_t
     \end{array}\right] + \boldsymbol{b}\right), where\:\boldsymbol{v}^T\:and\:W\:are \:trainable\:parameters
     $$ 
-- Decoder部分：对每个时间步有状态向量$\boldsymbol{s}_t$，在Encoder结束后，它被初始化为$\boldsymbol{s_0}=\boldsymbol{h}_m$。然后，在每个时间步$t$，使用align函数用$\boldsymbol{s}_t$与$\boldsymbol{h}_1\sim\boldsymbol{h}_m$分别计算得到一组对齐权重$\alpha_1\sim\alpha_m$（因为$\boldsymbol{h}_0=\boldsymbol{0}$，所以无需与其计算权重）。用计算得到的权重$\boldsymbol{h}_1\sim \boldsymbol{h}_m$加权，得到的加权平均向量即为context vector $\boldsymbol{c}_t$。接着，利用Decoder端的输入$$x^{\prime}_{t+1}$$、$\boldsymbol{c}_t$、$\boldsymbol{s}_t$更新$$\boldsymbol{s}_{t+1}$$，……。重复上述步骤直至Decoder端没有输入为止（或Decoder输出结果为EOS）。
+- Decoder部分：对每个时间步有状态向量$\boldsymbol{s}_t$，在Encoder结束后，它被初始化为$\boldsymbol{s_0}=\boldsymbol{h}_m$。然后，在每个时间步$t$，使用align函数用$\boldsymbol{s}_t$与$\boldsymbol{h}_1\sim\boldsymbol{h}_m$分别计算得到一组对齐权重$\alpha_1\sim\alpha_m$（因为$\boldsymbol{h}_0=\boldsymbol{0}$，所以无需与其计算权重）。用计算得到的权重$\boldsymbol{h}_1\sim \boldsymbol{h}_m$加权，得到的加权平均向量即为context vector $\boldsymbol{c}_t$。接着，利用Decoder端的输入$x^{\prime}_{t+1}$、$\boldsymbol{c}_t$、$\boldsymbol{s}_t$更新$\boldsymbol{s}_{t+1}$，……。重复上述步骤直至Decoder端没有输入为止（或Decoder输出结果为EOS）。
   >**计算公式为**：  
   $$
   \tilde{\alpha}_i=\boldsymbol{v}^T\cdot\rm{tanh}\left(W\cdot\left[
@@ -93,7 +93,7 @@ def positional_encoding(position, d_model):
     \end{array}\right] + \boldsymbol{b}\right)
   $$ 
 
-&emsp;&emsp;在Transformer中，与上述过程类似，但要计算三组参数：Query：$$\boldsymbol{q}_{:j}=W_Q\boldsymbol{s}_j$$，Key：$$\boldsymbol{k}_{:i}=W_K\boldsymbol{h}_i$$，Value：$$\boldsymbol{v}_{:i}=W_V\boldsymbol{h}_i$$，其中$i\in\{1,\cdots,m\}, j\in\{1,\cdots,m^\prime\}$。三组参数中Query是在Decoder端，用来匹配其它项；Key和Value在Encoder端，其中Key用于和Query匹配，Value则用于被加权平均。将$$\boldsymbol{k}_{:i}$$拼成矩阵$K$，$$\boldsymbol{v}_{:i}$$拼成矩阵$V$，$$\boldsymbol{q}_{:j}$$拼成矩阵$Q$。权重的计算公式为：  
+&emsp;&emsp;在Transformer中，与上述过程类似，但要计算三组参数：Query：$\boldsymbol{q}_{:j}=W_Q\boldsymbol{s}_j$，Key：$\boldsymbol{k}_{:i}=W_K\boldsymbol{h}_i$，Value：$\boldsymbol{v}_{:i}=W_V\boldsymbol{h}_i$，其中$i\in\{1,\cdots,m\}, j\in\{1,\cdots,m^\prime\}$。三组参数中Query是在Decoder端，用来匹配其它项；Key和Value在Encoder端，其中Key用于和Query匹配，Value则用于被加权平均。将$\boldsymbol{k}_{:i}$拼成矩阵$K$，$\boldsymbol{v}_{:i}$拼成矩阵$V$，$\boldsymbol{q}_{:j}$拼成矩阵$Q$。权重的计算公式为：  
 $$\boldsymbol{\alpha}_j=\rm{Softmax}(K^T\boldsymbol{q}_j)\in\mathbb{R}^m \tag{2}$$  
 &emsp;&emsp;在此基础上计算context vector：  
 $$\boldsymbol{c}_j=\alpha_{1j}\boldsymbol{v}_{:1}+\cdots+\alpha_{mj}\boldsymbol{v}_{:m}=V\cdot\rm{Softmax(K^T\boldsymbol{q}_{:j})}, for\:i\:=\:1\:to\:m^\prime \tag{3}$$  
@@ -145,13 +145,13 @@ def scaled_dot_product_attention(q, k, v, mask):
     return output, attention_weights
 ```
 ### 3. Self-attention在Transformer中的应用
-&emsp;&emsp;[Self-attention](https://arxiv.org/abs/1601.06733)与上述attention的原理完全一致，区别是**self-attention层只有一个输入序列$\boldsymbol{x}_i\in\mathbb{R}^m$，而attention层则需要两个（一个是原始序列，一个是目标序列）**。该层拥有三组参数：Query：$$\boldsymbol{q}_{:j}=W_Q\boldsymbol{x}_i$$，Key：$$\boldsymbol{k}_{:i}=W_K\boldsymbol{x}_i$$，Value：$$\boldsymbol{v}_{:i}=W_V\boldsymbol{x}_i$$。Self-attention的输出为$m$个context vector向量，由于self-attention层与RNN有着同样的输入及输出，因此可以用self-attention来完全代替RNN。
+&emsp;&emsp;[Self-attention](https://arxiv.org/abs/1601.06733)与上述attention的原理完全一致，区别是**self-attention层只有一个输入序列$\boldsymbol{x}_i\in\mathbb{R}^m$，而attention层则需要两个（一个是原始序列，一个是目标序列）**。该层拥有三组参数：Query：$\boldsymbol{q}_{:j}=W_Q\boldsymbol{x}_j$，Key：$\boldsymbol{k}_{:i}=W_K\boldsymbol{x}_i$，Value：$\boldsymbol{v}_{:i}=W_V\boldsymbol{x}_i$。Self-attention的输出为$m$个context vector向量，由于self-attention层与RNN有着同样的输入及输出，因此可以用self-attention来完全代替RNN。
 
 ### 4. Multi-Head Self-attention（Encoder）
-&emsp;&emsp;Multi-head self-attention就是使用多个上文中的single-head self-attention，它们共享一个输入（一个序列），各自有着独立的参数并输出各自计算得到的context vector，最后将各head的输出堆叠即为multi-head self-attention层的输出。Multi-head self-attention层的每路输出（若输入序列长度为m，head数为d，则共有m路输出，每路为d个context vector的堆叠）会各自经过一个Dense层，再经过ReLU等激活函数产生新的输出$$\boldsymbol{u}_1,\boldsymbol{u}_2,\cdots,\boldsymbol{u}_m$$，其中每路向量$$\boldsymbol{u}_{:i}$$都包含了序列中的所有信息。这里每路的Dense层共享参数，这是合理的，因为模型对每路的处理流程都是一样的。 
+&emsp;&emsp;Multi-head self-attention就是使用多个上文中的single-head self-attention，它们共享一个输入（一个序列），各自有着独立的参数并输出各自计算得到的context vector，最后将各head的输出堆叠即为multi-head self-attention层的输出。Multi-head self-attention层的每路输出（若输入序列长度为m，head数为d，则共有m路输出，每路为d个context vector的堆叠）会各自经过一个Dense层，再经过ReLU等激活函数产生新的输出$\boldsymbol{u}_1,\boldsymbol{u}_2,\cdots,\boldsymbol{u}_m$，其中每路向量$\boldsymbol{u}_{:i}$都包含了序列中的所有信息。这里每路的Dense层共享参数，这是合理的，因为模型对每路的处理流程都是一样的。 
 ### 5. Multi-Head Attention（Decoder）
 &emsp;&emsp;与Multi-head self-attention类似，Multi-head attention原理也是如此，使用多个attention层，它们共享相同的输入（两个不同的序列），但各自有着独立的参数并输出各自计算得到的context vector，最后将各head的输出堆叠即为multi-head attention层的输出。  
-&emsp;&emsp;Decoder也由多个block组成，每个block由三层组成，第一层是Multi-head self-attention层，输入是$\boldsymbol{x}^\prime_1,\boldsymbol{x}^\prime_2,\cdots,\boldsymbol{x}^\prime_{m^\prime}$，输出为$\boldsymbol{c}^\prime_1,\boldsymbol{c}^\prime_2,\cdots,\boldsymbol{c}_{m^\prime}$。第二层是Multi-head attention层，该层输入序列为两个，一个为Encoder部分的最终输出，另一个为第一层网络生成的序列$$\boldsymbol{c}^\prime_1,\boldsymbol{c}^\prime_2,\cdots,\boldsymbol{c}_{m^\prime}$$。该层的输出为$$\boldsymbol{z}^\prime_1,\boldsymbol{z}^\prime_2,\cdots,\boldsymbol{z}_{m^\prime}$$，是与输入同维度的向量。将第二层的各路输出经过一个Dense层（共享参数），再经过ReLU等激活函数产生新的输出$$\boldsymbol{s}^\prime_1,\boldsymbol{s}^\prime_2,\cdots,\boldsymbol{s}_{m^\prime}$$，作为该block的最终输出。  
+&emsp;&emsp;Decoder也由多个block组成，每个block由三层组成，第一层是Multi-head self-attention层，输入是$\boldsymbol{x}^\prime_1,\boldsymbol{x}^\prime_2,\cdots,\boldsymbol{x}^\prime_{m^\prime}$，输出为$\boldsymbol{c}^\prime_1,\boldsymbol{c}^\prime_2,\cdots,\boldsymbol{c}_{m^\prime}$。第二层是Multi-head attention层，该层输入序列为两个，一个为Encoder部分的最终输出，另一个为第一层网络生成的序列$\boldsymbol{c}^\prime_1,\boldsymbol{c}^\prime_2,\cdots,\boldsymbol{c}_{m^\prime}$。该层的输出为$\boldsymbol{z}^\prime_1,\boldsymbol{z}^\prime_2,\cdots,\boldsymbol{z}_{m^\prime}$，是与输入同维度的向量。将第二层的各路输出经过一个Dense层（共享参数），再经过ReLU等激活函数产生新的输出$\boldsymbol{s}^\prime_1,\boldsymbol{s}^\prime_2,\cdots,\boldsymbol{s}_{m^\prime}$，作为该block的最终输出。  
 ### 6. Encoder+Decoder
 &emsp;&emsp;通过将Encoder、Decoder结合起来，便组成了完整的Transformer模型：  
 ![Transformer模型结构](/img/NLP/Transformer.jpg)  

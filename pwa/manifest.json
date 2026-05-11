@@ -1,7 +1,7 @@
 {
-  "name": "Hux Blog",
-  "short_name": "Hux Blog",
-  "description": "About an engineer & designer who loves web.",
+  "name": "Jie Ren",
+  "short_name": "Jie Ren",
+  "description": "Personal homepage and technical blog of Jie Ren.",
   "icons": [{
     "src": "icons/128.png",
     "sizes": "128x128",

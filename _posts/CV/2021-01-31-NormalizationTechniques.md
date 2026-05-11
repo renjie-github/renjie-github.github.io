@@ -2,7 +2,7 @@
 layout: post
 title: "深度学习之——Normalization"
 subtitle: "Normalization Techniques"
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/CV/GroupNormalization.jpg"
 header-mask: 0.4
 mathjax: true
@@ -29,7 +29,7 @@ $$
 
 &emsp;&emsp;对于输入维度为d的网络层，输入$x=(x^{(1)},\cdots,x^{(d)})$，输入的每个维度均被单独标准化：  
 $$
-\hat{x}_i^{(k)} = \frac{x_i^{(k)} - \mu_B^{(k)}}{\sqrt{\sigma_B^{(k)^2} + \epsilon}},\quad where\; k\in[1, d], \quad i\in[1, m] \tag{2}
+\hat{x}_i^{(k)} = \frac{x_i^{(k)} - \mu_B^{(k)}}{\sqrt{(\sigma_B^{(k)})^2 + \epsilon}},\quad k\in[1, d], \quad i\in[1, m] \tag{2}
 $$  
 &emsp;&emsp;上式中$\epsilon$是一个很小的非零值，用于避免除零错误。经过上步处理后的$\hat{x}^{(k)}$均值为0方差为1（不考虑$\epsilon$）。为了重建网络的表达能力，再对输入进行进一步变换：  
 $$
@@ -38,7 +38,7 @@ $$
 &emsp;&emsp;其中参数$\gamma^{(k)}$和$\beta^{(k)}$为可训练的参数，在优化过程中进行学习。对于每一层内部来说，输出一直为正态分布，由模型来学习真正适合下一层的输出数值范围。  
 &emsp;&emsp;BN操作是可微分的，直接使用链式法则求导即可。训练阶段，BN层参数靠mini-batch来保证有效的训练，但在推理阶段，将使用训练期间得到的统计数据来对输入进行标准化操作，即用计算得到的均值和方差期望来代替训练时所用数据：  
 $$
-E[x^{(k)}]=E_B[\mu_B^{(k)}], \quad Var[x^{(k)}]=\frac{m}{m-1}E_B[\sigma_B^{(k)^2}] \\
+E[x^{(k)}]=E_B[\mu_B^{(k)}], \quad Var[x^{(k)}]=\frac{m}{m-1}E_B[(\sigma_B^{(k)})^2] \\
 y^{(k)}=\frac{\gamma^{(k)}}{\sqrt{Var[x^{(k)}]+\epsilon}}x^{(k)}+(\beta^{(k)}-\frac{\gamma^{(k)}E[x^{(k)}]}{\sqrt{Var[x^{(k)}]+\epsilon}}) \tag{4}
 $$  
 &emsp;&emsp;以一维向量的样本为例，假设输入样本$x$的维度为$(1, d)$，则BN层的参数为$4\times d$个。若样本为图片，即输入样本$x$的维度为$(H, W, C)$，则BN层的参数为$4\times C$个（即对每个channel求一组$\mu,\sigma,\gamma,\beta$）。以求均值$\mu$为例，具体做法是将该batch内，所有N个样本的该channel对应的$H\times W$矩阵中，包含的所有元素求和取平均（除以$N\times H\times W$），最终得到$C$个标量值，对应$C$个channel的均值。完整公式如下：  
@@ -53,7 +53,7 @@ $$
 &emsp;&emsp;计算LN时，若输入为图片，即输入样本$x$的维度为$(H, W, C)$。以求均值$\mu$为例，具体做法是：将每个样本（对应一个$H\times W\times C$的三维矩阵）中的所有元素求和取平均，作为该样本的均值$\mu$。完整公式如下：  
 $$
 \mu_n=\frac{1}{CHW}\sum_{i=1}^{C}\sum_{j=1}^{H}\sum_{k=1}^{W}x_{nijk} \\
-\sigma_n^{2}=\frac{1}{CHW}\sum_{i=1}^{C}\sum_{j=1}^{H}\sum_{k=1}^{W}(x_{nijk}-\mu_c)^2 \\
+\sigma_n^{2}=\frac{1}{CHW}\sum_{i=1}^{C}\sum_{j=1}^{H}\sum_{k=1}^{W}(x_{nijk}-\mu_n)^2 \\
 \hat{x}=\frac{x-\mu_n}{\sqrt{\sigma_n^2+\epsilon}} \tag{6}
 $$
 
@@ -62,7 +62,7 @@ $$
 &emsp;&emsp;作者将mean-only batch normalization和weight normalization结合起来，即像BN一样减去mini-batch的均值，但不除以mini-batch的标准差，在训练期间维护一个mini-batch均值的移动平均以用于测试阶段代替均值。同时，使用WN来代替除以方差的操作。Mean-only batch normalization有着使反向传播的梯度居中的效果，而且这一操作也比BN有着更少的开销以及更少的噪声。这背后的原因是：**依据大数定理，neuron activation的均值以及反向传播梯度的均值是近似正态分布的，从而其产生的噪声更加gentle**。  
 
 ## Instance Normalization
-&emsp;&emsp;[Instance Normalization](https://arxiv.org/abs/1607.08022)（2017年提出，下简称LN）是在BN、LN的基础上更细粒度的改进。IN相当于BN$\cap$LN但又有不同。IN与LN的不同之处在于：IN在每个训练样本的channel层面上进行标准化，而不是像LN那样在整个样本的层面上进行标准化。IN与BN的不同之处在于：IN层在推理阶段也会使用（**因为mini-batch的无依赖性**）。IN最早被计用于风格迁移中，因为图像风格化中，生成图片的结果主要依赖于某个独立的图片实例，所以不适合用BN来标准化，但可以针对HW层面做标准化以保持每个图像示例之间的相互独立。IN的参数维度将是$C\times N$。完整公式如下：  
+&emsp;&emsp;[Instance Normalization](https://arxiv.org/abs/1607.08022)（2017年提出，下简称IN）是在BN、LN的基础上更细粒度的改进。IN相当于BN$\cap$LN但又有不同。IN与LN的不同之处在于：IN在每个训练样本的channel层面上进行标准化，而不是像LN那样在整个样本的层面上进行标准化。IN与BN的不同之处在于：IN层在推理阶段也会使用（**因为mini-batch的无依赖性**）。IN最早被用于风格迁移中，因为图像风格化中，生成图片的结果主要依赖于某个独立的图片实例，所以不适合用BN来标准化，但可以针对HW层面做标准化以保持每个图像示例之间的相互独立。IN的仿射参数通常按通道学习，参数量为$2C$（$\gamma$与$\beta$）。完整公式如下：  
 $$
 \mu_{nc}=\frac{1}{HW}\sum_{j=1}^{H}\sum_{k=1}^{W}x_{ncjk} \\
 \sigma_{nc}^{2}=\frac{1}{HW}\sum_{j=1}^{H}\sum_{k=1}^{W}(x_{ncjk}-\mu_{nc})^2 \\
@@ -71,7 +71,7 @@ $$
 
 ## Group Normalization
 &emsp;&emsp;BN性能的保证有个前提条件是batch size要足够大，以保证统计特性估计的准确性。对于训练大的模型并迁移特征，以及包括目标检测、语义分割、视频等受显存限制而要求较小数据batch的计算机视觉领域，BN的使用受到了限制。此时[Group Normalization](https://arxiv.org/abs/1803.08494)（2018年提出，后简称GN）提供了一种在小batch size下使用Normalization的方法。GN将channel分割为多个group，则每个group有C/G（即为$c$）个通道，在每个group内分别计算均值和方差。**GN的计算独立于batch size，且其准确性在较大的batch size选择范围内都比较稳定。**GN是介于IN与LN之间的一种标准化方法。如果group数为1，则GN变为LN，如果group数等于channel数C，则GN变为IN。  
-&emsp;&emsp;假设通道数为G，则完整计算公式如下：  
+&emsp;&emsp;假设通道数为$C$、分组数为$G$，每组包含$C/G$个通道，则完整计算公式如下：  
 $$
 \mu_{ng}=\frac{1}{\frac{C}{G}HW}\sum_{i=1}^{C/G}\sum_{j=1}^{H}\sum_{k=1}^{W}x_{icjk} \\
 \sigma_{ng}^{2}=\frac{1}{\frac{C}{G}HW}\sum_{i=1}^{C/G}\sum_{j=1}^{H}\sum_{k=1}^{W}(x_{icjk}-\mu_{ng})^2 \\

@@ -1,10 +1,10 @@
 # Site settings
-title: Roger Blog
-SEOTitle: Roger的博客 | Roger Blog | renjie-github Blog
+title: Jie Ren
+SEOTitle: Jie Ren | Applied Researcher | Machine Learning
 header-img: img/home-bg.jpg
 email: renjie_sjtu@126.com
-description: "关于机器学习等的一些技术分享 | Roger，Machine Learning Engineer | 这里是 Roger 的个人博客，与你一起发现更大的世界。"
-keyword: "ML RL"
+description: "Jie Ren is an Applied Researcher II at eBay, focused on vision-language models, multimodal retrieval, NLP, and large-scale machine learning systems."
+keyword: "Jie Ren, machine learning, vision-language model, multimodal retrieval, NLP, vector retrieval"
 url: "https://renjie-github.github.io"              # your host, for absolute URL
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
 
@@ -15,7 +15,7 @@ future: true
 RSS: false
 #weibo_username:     huxpro
 #zhihu_username:     huxpro
-github_username:    renjie-github
+# github_username:
 #twitter_username:   huxpro
 #facebook_username:  huxpro
 #linkedin_username:  firstname-lastname-idxxxx
@@ -26,7 +26,6 @@ github_username:    renjie-github
 # from 2016, 'pygments' is unsupported on GitHub Pages. Use 'rouge' for highlighting instead.
 highlighter: rouge
 permalink: pretty
-paginate: 10
 exclude: ["less","node_modules","Gruntfile.js","package.json","README.md","README.zh.md"]
 anchorjs: true                          # if you want to customize anchor. check out line:181 of `post.html`
 # If you have timezone issue (e.g. #68) in China, uncomment to use this:
@@ -38,7 +37,8 @@ anchorjs: true                          # if you want to customize anchor. check
 # from PR#40, to support local preview for Jekyll 3.0
 # make sure you have this gem installed
 # `$ gem install jekyll-paginate`
-plugins: [jekyll-paginate]
+# No pagination plugin is needed: the homepage is a profile and /blog/ lists posts directly.
+plugins: []
 
 
 
@@ -78,7 +78,7 @@ ba_track_id: 6c7792a4c2c09eec289f034ae36d045a
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "开始下一段旅程<br>On my way...<br>微信公众号：机器学习算法之路"
+sidebar-about-description: "Applied researcher at eBay focused on VLMs, multimodal retrieval, NLP, and search science."
 sidebar-avatar: /img/roger-github.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 

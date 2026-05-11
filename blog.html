@@ -1,0 +1,44 @@
+---
+layout: default
+title: "Blog"
+description: "Technical notes on machine learning, retrieval, and systems"
+header-img: "img/blog-desktop.jpg"
+permalink: /blog/
+no-catalog: true
+---
+
+{% include intro-header.html type='page' short=true %}
+
+<main class="blog-main">
+    <section class="blog-intro">
+        <div>
+            <p class="profile-kicker">{{ site.posts.size }} notes</p>
+            <h1>Technical Writing</h1>
+            <p>Notes and long-form summaries on machine learning, NLP, reinforcement learning, vector retrieval, model training, and engineering practice.</p>
+        </div>
+        <a class="blog-archive-link" href="{{ site.baseurl }}/archive/">Browse by tag</a>
+    </section>
+
+    <section class="blog-list" aria-label="Blog posts">
+        {% for post in site.posts %}
+        <article class="blog-item">
+            <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time>
+            <div class="blog-item__content">
+                <a href="{{ post.url | prepend: site.baseurl }}">
+                    <h2>{{ post.title }}</h2>
+                </a>
+                {% if post.subtitle and post.subtitle != "" %}
+                <p>{{ post.subtitle }}</p>
+                {% endif %}
+                {% if post.tags.size > 0 %}
+                <div class="blog-tags">
+                    {% for tag in post.tags %}
+                    <a href="{{ site.baseurl }}/archive/?tag={{ tag | url_encode }}">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+</main>

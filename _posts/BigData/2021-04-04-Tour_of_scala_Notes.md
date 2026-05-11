@@ -2,7 +2,7 @@
 layout: post
 title: "Tour of Scala"
 subtitle: "学习笔记"
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/BigData/Scala.jpg"
 header-mask: 0.4
 mathjax: true
@@ -158,7 +158,7 @@ val endpoint = "users"
 val query = "id=1"
 val url = getURL(endpoint, query) // "https://www.example.com/users?id=1": String
 ```
-# 09 嵌套方法
+## 09 嵌套方法
 在Scala中可以嵌套方法（Nested Methods），如下为一个求阶的例子：  
 ```Scala
 def factorial(x: Int): Int = {
@@ -171,7 +171,7 @@ def factorial(x: Int): Int = {
 
 println("Factorial of 3: " + factorial(3)) // 6
 ```
-# 10 多参数列表
+## 10 多参数列表
 多参数列表（Multiple Parameter Lists）的典型用例是foldLeft：
 ```Scala
 trait Iterable[A] {
@@ -221,7 +221,7 @@ val res = numbers.foldLeft(0)((m, n) => m + n)
   println(cubes)  // List(1, 8, 27, 64, 125, 216, 343, 512, 729, 1000)
   ```
 
-# 11 Case类及模式匹配
+## 11 Case类及模式匹配
 ## Case类
 Case类比较适合构建immutable data，常用于模式匹配。定义一个最小case类需要关键词case class及一个参数列表（可以为空）。因为case类默认有apply方法，该方法负责对象的构建，所以新建一个case类不需要'new'。当用参数创建一个case类时，参数类型是'public val'的。    
 ```Scala
@@ -293,7 +293,7 @@ def findPlaceToSit(piece: Furniture): String = piece match {
 ```
 Scala的模式匹配语句对于匹配通过case类表示的代数类型最有用。Scala还允许独立于case类定义模式：在extractor对象中使用unapply方法。  
 
-# 12 单例对象
+## 12 单例对象
 单例对象（Singleton object）是**只具有一个实例**的**类**。像lazy val一样，它只有被引用时才会创建（lazily）。单例对象使用关键字'object'定义。  
 一个带有和它同名class的对象叫做伴生对象（companion object），对应的类叫做对象的伴生类（companion class）。伴生类/对象必须定义在同一个文件中。一个伴生类或对象可以获取其伴生对象或类的私有变量。对于不特定于伴生类实例的方法和值，使用伴生对象。如：
 ```Scala
@@ -339,7 +339,7 @@ scalaCenterEmail match {
 ```
 Java中的static成员在Scala中作为伴生对象中的普通成员被构建。当从Java中使用伴生对象时，成员将用'static'修饰符定义在伴生类中。这称为静态转发（static forwarding）。即使你自己没有定义伴生类，也会发生这种情况。
 
-# 13 正则表达式
+## 13 正则表达式
 ```Scala
 import scala.util.matching.Regex
 
@@ -367,7 +367,7 @@ val input: String =
 for (patternMatch <- keyValPattern.findAllMatchIn(input))
   println(s"key: ${patternMatch.group(1)} value: ${patternMatch.group(2)}")
 ```
-# 14 Extractor Object
+## 14 Extractor Object
 Extractor Object是具有'unapply'方法的对象。'apply'方法类似于一个构造器，使用输入变量构造一个对象。而'unapply'方法接收一个对象并且尝试将其转化为变量，常用于模式匹配即partial functions。
 ```Scala
 import scala.util.Random
@@ -396,7 +396,7 @@ customer1ID match {
 
 有时返回值的数量不是固定的，此时可以用'unapplySeq'方法来定义extractor，该extractor返回一个Option[Seq[T]]。这些模式的常见用例包括使用case List(x, y, z) => 来解构一个List，以及使用正则表达式Regex来分解一个字符串，如：case r(name, remainingFields @ _*) =>。
 
-# 15 For表达式
+## 15 For表达式
 ```Scala
 def foo(n: Int, v: Int) = 
   for (i <- 0 until n; j <- 0 until n if i + j == v)
@@ -408,7 +408,7 @@ foo(10, 10) foreach {
 }
 ```
 
-# 16 泛型类及其子类的Variance
+## 16 泛型类及其子类的Variance
 泛型类（Generic Class）是将类型作为参数的类，对于收集类很有用。
 ```Scala
 class Stack[A] {
@@ -434,7 +434,7 @@ stack.push(apple) // 可以存入子类
 stack.push(banana)
 ```
 
-# 17 Variance
+## 17 Variance
 Variance是复杂类型的子类相关性及它们的组成类型的子类关系。Scala支持泛型类类型参数的variance annotation。在类型系统中使用variance使得我们可以在复杂类型之间建立直观的联系，而缺乏方差会限制类抽象的重用。  
 ```Scala
 class Foo[+A] // A covariant class（协变类）
@@ -495,7 +495,7 @@ printMyCat(animalPrinter, Cat("Boots")) // The animal's name is: Boots
 ## Invariance
 Scala中的泛型类默认是不变类。即它们既不是covariant也不是contravariant。
 
-# 18 上类型边界及下类型边界
+## 18 上类型边界及下类型边界
 在Scala中，type parameters及abstract type parameters可能会被限制在类型边界中。类型边界限制了type variables的具体值，也揭示了关于该类的成员信息。
 ## Upper Type Bounds
 上类型边界**T <: A**声明了类型变量T是类型A的subtype，表示了类型T的上界（包含上界）。
@@ -579,7 +579,7 @@ val birdTypeAList = ListNode[BirdTypeA](BirdTypeA(), Nil())
 val birdList: Node[Bird] = birdTypeAList
 birdList.prepend(BirdTypeB())
 ```
-# 19 内部类
+## 19 内部类
 在Scala中，可以让类拥有其他类作为成员。在类似java的语言中，这样的内部类是外围类的成员，而**在Scala中，这样的内部类被绑定到外部对象**。假设我们希望编译器在编译时避免混淆哪个节点属于哪个图，依赖路径的类型（path-dependent types）提供了一个解决方案。
 ```Scala
 class Graph {
@@ -628,7 +628,7 @@ class Graph {
   }
 }
 ```
-# 20 抽象类成员
+## 20 抽象类成员
 抽象类（abstract type），比如trait及abstract class。可以有抽象类成员。这意味着为具体的实现定义了实际的类型。Trait或有着抽象类型成员的Calss经常与匿名类的实例化结合使用。
 ```Scala
 // 定义一个Trait，其具有抽象类型type T，用于描述element的类型
@@ -664,7 +664,7 @@ println("length = " + buf.length)
 println("content = " + buf.element)
 ```
 
-# 21 混合类型
+## 21 混合类型
 一个对象的类型是多个类型的子类的情况在Scala中可以通过混合类型（多个类型的交集）来表示。混合类型可以有多个对象类型组成并包含一个refinement，该refinement可用于缩窄现有对象成员的签名（signature）。混合类型的一般形式为：A with B with C ... {refinement}
 ```Scala
 // 可复制
@@ -686,7 +686,7 @@ def cloneAndReset(obj: Cloneable with Resetable): Cloneable = {
 }
 ```
 
-# Self类型
+## Self类型
 Self类型（Self-type）是用于：声明一个trait必须被混入（mixed in）另一个trait的方法，即使它没有被直接扩展（extend）。这使得依赖的成员即使不导入也可以使用。  
 Self-type是一种缩窄**this**类型的方法。为了在一个trait中使用self-type，需要写一个标识符，加上另一个需要混入的trait的类型，再加上一个**=>**：someIdentifier: SomeOtherTrait =>
 ```Scala
@@ -709,7 +709,7 @@ val someOne = new VerifiedTweeter("Rachael")
 some.tweet("Hi there.")
 ```
 
-# 22 隐式参数
+## 22 隐式参数
 一个方法可以有一个隐式参数（implicit parameter）列表，在参数列表的前面用**implicit**来标记。如果参数列表中的参数没有被正常传递，那么Scala将查看是否可以获得正确类型的隐式值，如果可以，该隐式值就会被自动传递。  
 Scala寻找隐式参数值的地方有两个：  
  - 调用含有隐式参数的方法时，首先查找可以直接获取（无需前缀）的implicit定义及implicit参数
@@ -747,7 +747,7 @@ object ImplicitTest {
 }
 ```
 
-# 23 隐式转换
+## 23 隐式转换
 从类型S到类型T的隐式转换用一个具有函数类型**S => T**的隐式值（或者用一个可以转换为该类型的隐式方法）定义。隐式转换有两种应用场景：  
  - 如果表达式e的类型为S，并且S不满足期望类型T
   
@@ -779,7 +779,7 @@ implicit def list2ordered[A](x: List[A])
  - 在隐式转换定义范围内导入scala.language.implicitConversions
  - 使用language:implicitConversions调用编译器
 
-# 24 多态方法及类型推断
+## 24 多态方法及类型推断
 Scala中的方法既可以通过类型参数化，也可以通过值参数化。语法类似于泛型类。类型参数用方括号括起来，而值参数用圆括号括起来。并不总是需要显式地提供类型参数，编译器一般都可以基于上下文推断值变量的类型。
 ```Scala
 def listOfDuplicates[A](x: A, length: Int): List[A] = {
@@ -808,7 +808,7 @@ obj = new AnyRef
 ```
 为了可读性起见，应显式地指定类型。
 
-# 25 算子
+## 25 算子
 Scala中，算子（operator）本质是方法（method），任何有单个参数的方法可以被用作中缀运算符（infix operator）。如+可以用.来调用：10.+(1)，更可读的方式是写为中缀运算符：10 + 1  
 ## 定义及使用算子
 ```Scala
@@ -840,7 +840,7 @@ a + b ^? c ?^ d less a ==> b | c
 // 上式等同于：
 ((a + b) ^? (c ?^ d)) less ((a ==> b) | c)
 ```
-# 26 按名称参数与按值参数
+## 26 按名称参数与按值参数
 按名称参数（by-name parameter）每次使用的时候都会评估一次，如果他们没有被使用则不会被评估（evaluated），这对于评估时需要大量计算或长时间运行某段代码的参数时可以帮助提高程序性能。对应的是按值参数（by-value parameter），好处是只需评估一次。为了使一个参数是by-name的，需要在其类型前面加上**=>**的前缀。  
 ```Scala
 def calculate(input: => Int) = input * 37
@@ -858,7 +858,7 @@ whileLoop(i > 0) {
   i -= 1
 }
 ```
-# 注释
+## 注释
 注释（annotation）将元信息与定义关联起来。例如，方法前的注释@deprecated会导致编译器在使用该方法时打印警告。注释子句应用于它后面的第一个定义或声明。一个定义和声明之前可以有多个注释子句。这些子句的先后顺序不重要。
 ```Scala
 object DeprecationDemo extends App {
@@ -920,7 +920,7 @@ public class MyClass extends TheirClass ...
 class MyScalaClass ...
 ```
 
-# 27 包及包的导入
+## 27 包及包的导入
 ## 创建包
 通过在Scala文件的顶部声明一个或多个包名来创建包（package）。一种约定是将包命名为与包含Scala文件的目录相同的名称。然而，Scala与文件布局无关。还有一种声明package的方法是使用括号：
 ```Scala

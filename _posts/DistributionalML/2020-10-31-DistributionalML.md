@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "分布式机器学习"
-subtitle: "Distributional Machine Learning"
-author: "Roger"
+subtitle: "Distributed Machine Learning"
+author: "Jie Ren"
 header-img: "img/distributed_ML.png"
 header-mask: 0.4
 mathjax: true
@@ -14,13 +14,13 @@ tags:
 ## 为什么要并行
 &emsp;&emsp;现在的机器学习训练数据集越来越大，模型参数规模也越来越大（如BERT），训练时间会变得很长，更不用说模型调参了。而单个主机可扩展的CPU/GPU数量有限，想要做大规模训练就需要用到大量节点来同时计算。  
 **重要概念**  
-- 通信方式：共享内存 V.S. 消息传递
-- 节点结构：客户端-服务器端 V.S. 点对点
-- 同步方式：批量同步 V.S. 异步
-- 并行方式：数据并行 V.S. 模型并行
+- 通信方式：共享内存 vs. 消息传递
+- 节点结构：客户端-服务器端 vs. 点对点
+- 同步方式：批量同步 vs. 异步
+- 并行方式：数据并行 vs. 模型并行
 
 ## 线性回归简介
-&emsp;&emsp;对于线性回归模型，我们要求的是对于给定输入$x\in\mathbb{R}^d$，预测$f(x)=x^Tw$，其中$w$为模型参数。模型参数可以通过最小化损失函数$L(w)=\sum_{i=1}^{n}\frac{1}{2}(x_i^Tw-y_i)^2$得到。计算该损失函数的梯度为$g(w)=\frac{\partial L(w)}{\partial w}=\sum_{i=1}^{n}g_i(w)=\sum_{i=1}^{n}(x_i^Tw-y_i)x_i$，求得的结果$g(w)$为一个维度和$w$相同的向量，求得梯度后可以使用梯度下降方法来调整参数。可以看到$g_i$是与独立的样本相关联的，这使得分布式计算可以相互独立进行。线性回归梯度的计算是最耗时的，这一部分的时间复杂度为$O(m\ast n)$，其中$m$和$n$分别为样本大小和参数维度。通过将样本及参数$w$均匀地分配到不同的处理器上，分别计算梯度$g$后再累加起来便可得到最终梯度。  
+&emsp;&emsp;对于线性回归模型，给定输入$x\in\mathbb{R}^d$，预测$f(x)=x^\top w$，其中$w$为模型参数。模型参数可以通过最小化损失函数$L(w)=\sum_{i=1}^{n}\frac{1}{2}(x_i^\top w-y_i)^2$得到。该损失函数的梯度为$g(w)=\frac{\partial L(w)}{\partial w}=\sum_{i=1}^{n}g_i(w)=\sum_{i=1}^{n}(x_i^\top w-y_i)x_i$，求得的结果$g(w)$为一个维度和$w$相同的向量，求得梯度后可以使用梯度下降方法来调整参数。可以看到$g_i$只依赖于第$i$个样本，这使得分布式计算可以按样本切分并相互独立地计算局部梯度。线性回归梯度计算的时间复杂度为$O(nd)$，其中$n$和$d$分别为样本数和特征维度。通过将样本均匀分配到不同的worker上，分别计算局部梯度后再累加，便可得到最终梯度。  
 ## 处理器间通信
 1. 共享内存的方法比较容易，但无法大规模并行，因为需要在同一主机上运行，无法扩展到大规模集群。
 2. 消息传递方式，多个节点，每个节点都有若干处理器，各个节点之间可通过TCP/IP等协议进行通信以传递必要的消息。这种方法有两种架构方式：  
@@ -35,7 +35,7 @@ tags:
 &emsp;&emsp;算法流程如下：
 - 广播参数：server将最新参数广播给所有worker
 - Map：worker在本地计算
-  - 将$(x_i,y_i,w_t)$映射为$g_i=(x_i^Tw-y_i)x_i$
+  - 将$(x_i,y_i,w_t)$映射为$g_i=(x_i^\top w-y_i)x_i$
   - n个样本得到n个向量：$g_1,g_2,g_3,\cdots,g_n$
 - Reduce：每个worker通过求和得到本地梯度向量$g=\sum_{i=1}^{n}g_i$，然后server将m个worker的梯度结果相加得到最终的梯度向量$g$
 - server更新参数：$w_{t+1}=w_t-\alpha\cdot g$  
@@ -50,8 +50,8 @@ tags:
 #### 同步开销
 &emsp;&emsp;由于是同步并行的，所以每轮迭代计算时间是由最慢的worker决定的。且如果一个节点故障重启，则会造成整体耗时的增加，而且节点越多，故障的概率也就越大，同步时间开销也就越大。  
 ### 2. Parameter Server（异步算法）
-&emsp;&emsp;[2011年](https://papers.nips.cc/paper/4390-hogwild-a-lock-free-approach-to-parallelizing-stochastic-gradient-descent.pdf)后开始流行。同步算法理论上更快，但由于同步开销等原因，使得异步算法实际上更快。异步算法的Parameter server架构也是**Client-Server**架构，其中一个（或几个）节点作为server，用于调度协调其它节点，其它则为worker节点。worker计算梯度并将梯度发给server，server完成梯度并将更新后的参数发给worker。  
-&emsp;&emsp;Parameter server和MapReduce很像：架构均为client-Server，通信方式均为message-passing，二者的主要区别在于通信的同步/异步。同步算法在每一轮迭代中需要等待所有worker完成运算后才可以进行通信，这使得每一轮迭代时间由最慢的worker来决定，大量时间浪费在等待上。而异步算法不需要等待所有worker完成计算，每个worker完成运算后立即与server通信并开始下一轮计算，无需等待其它worker，效率很高。异步梯度下降流程如下（对于数据并行引用场景）：  
+&emsp;&emsp;[2011年](https://papers.nips.cc/paper/4390-hogwild-a-lock-free-approach-to-parallelizing-stochastic-gradient-descent.pdf)后开始流行。同步算法每一步的梯度更新更一致，但由于同步等待和通信开销，实际吞吐未必更高。异步算法的Parameter server架构也是**Client-Server**架构，其中一个（或几个）节点作为server，用于调度协调其它节点，其它则为worker节点。worker计算梯度并将梯度发给server，server完成参数更新并将更新后的参数发给worker。  
+&emsp;&emsp;Parameter server和MapReduce很像：架构均为client-server，通信方式均为message-passing，二者的主要区别在于通信的同步/异步。同步算法在每一轮迭代中需要等待所有worker完成运算后才可以进行通信，这使得每一轮迭代时间由最慢的worker来决定，大量时间浪费在等待上。而异步算法不需要等待所有worker完成计算，每个worker完成运算后立即与server通信并开始下一轮计算，无需等待其它worker，效率很高。异步梯度下降流程如下（对于数据并行应用场景）：  
 1. 将数据平均划分到所有m个worker中，每个节点拥有部分数据（inputs & targets）
 2. worker端和server端以不同的方式进行计算：
 

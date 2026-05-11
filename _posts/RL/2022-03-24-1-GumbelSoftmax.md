@@ -2,7 +2,7 @@
 layout: post
 title: "Gumbel-Softmax"
 subtitle: "可微的离散变量采样"
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/VAE/GumbelSoftmax.jpg"
 header-mask: 0.4
 mathjax: true
@@ -22,9 +22,9 @@ tags:
 &emsp;&emsp;本节定义Gumbel-Softmax分布，它是一个单纯形上的一个连续分布，可以用来近似来自类别分布（categorical distribution）的样本。令$z$为一个类别变量，每个类别的概率为$\pi_1,\pi_2,\cdots\pi_k$。假设类别样本被编码为位于$(k-1)$维单纯形$\Delta^{k-1}$的“corner”上的$k$维one-hot向量。  
 &emsp;&emsp;Gumbel-Max trick提供了一个简单高效的方式来从一个类别分布中以类别概率$\pi$抽取样本$z$：  
 $$
-z = one\_hot(argmax_i[g_i+log\pi_i]) \tag{1}
+z = \operatorname{one\_hot}\left(\arg\max_i[g_i+\log\pi_i]\right) \tag{1}
 $$  
-其中$g_1\cdots g_k$是从Gumbel(0, 1)分布中抽取的独立同分布样本。对Gumbel(0, 1)分布采样可以使用逆变换采样，通过从均匀分布$u\sim \rm{Uniform(0, 1)}$中抽取$u$，然后计算$g=-log(-log(u))$得到。  
+其中$g_1\cdots g_k$是从Gumbel(0, 1)分布中抽取的独立同分布样本。对Gumbel(0, 1)分布采样可以使用逆变换采样，通过从均匀分布$u\sim \operatorname{Uniform}(0, 1)$中抽取$u$，然后计算$g=-\log(-\log(u))$得到。  
 >&emsp;&emsp;这里可能会有疑问：为什么不直接从类别分布中采样呢？为解答这个问题，需要介绍来自[VAE](https://arxiv.org/abs/1312.6114)中的reparameterization trick。通过从一个固定的分布中采样$g$并使用$\pi$来重参数化这个分布，避免了必须反向传播通过随机节点（在这里指采样得到的$g$）。取而代之的是只需要反向传播到确定性的重参数化，更新概率$\pi_i$。  
 <!-- >&emsp;&emsp;具体地说，假如我们想计算$\mathbb{E}_{x\sim p_\theta(x)}\left[f(x)\right]$，而从分布$p_\theta(x)$中直接（离散）采样会导致梯度无法计算，reparameterization trick则是通过变换来使得梯度可以计算。假设我们有一个$\epsilon\sim p(\epsilon)$，然后通过一个确定性的变换$x=g_\theta(\epsilon)$来生成$x$，这允许我们将要求的期望改写为：  
 $$
@@ -38,7 +38,7 @@ $$
 
 &emsp;&emsp;我们使用softmax函数来作为argmax的一个连续、可微的近似，并且生成$k$维的样本向量$y\in\Delta^{k-1}$，其中：  
 $$
-y_i=\frac{exp(log(\pi_i)+g_i)}{\sum_{j=1}^{k}exp((log(\pi_j)+g_j)/\tau)},\;for\; i=1,\cdots,k. \tag{2}
+y_i=\frac{\exp((\log(\pi_i)+g_i)/\tau)}{\sum_{j=1}^{k}\exp((\log(\pi_j)+g_j)/\tau)},\quad i=1,\cdots,k. \tag{2}
 $$  
 &emsp;&emsp;Gumbel-Softmax分布的概率密度函数为：  
 $$
@@ -52,7 +52,7 @@ $$
 ![reparameterization](/img/VAE/reparameterization_1.jpg "VAE Network") 
 &emsp;&emsp;图中有一个采样操作（对应计算图中的sampling node），而无法通过sampling node做梯度的反向传播。Reparameterization trick就是为了解决这一问题，它将latent vector $z$看做：
 $$
-z=\mu+\sigma\odot\epsilon,\;where\;\epsilon\sim Normal(0, 1) \tag{4}
+z=\mu+\sigma\odot\epsilon,\quad \epsilon\sim \mathcal{N}(0, 1) \tag{4}
 $$  
 其中$\mu$和$\sigma$是要学习的参数，$\epsilon$是引入的随机部分，它服从标准正态分布。通过这一步，可以使梯度顺畅地反向传播到要学习的参数$\mu$和$\sigma$，而$\epsilon$对应的是一个固定的stochastic node，我们不需要对它求导也不会改变它的参数，所以无所谓该node是否做sampling操作。如下图所示：
 ![reparameterization](/img/VAE/reparameterization_2.jpg "VAE Network") 
@@ -87,13 +87,13 @@ def sample_gumbel_01(shape, eps=1e-10):
 def gumbel_softmax_sample(logits, temperature):
     """Draw a sample from the Gumbel-Softmax distribution"""
     # logits: [batch_size, n_classes], unnormalized log-probs
-    y = logits + self.sample_gumbel_01(tf.shape(logits))
+    y = logits + sample_gumbel_01(tf.shape(logits))
     return tf.nn.softmax(y / temperature, axis=-1) # sum of each line equals 1
 
 def gumbel_softmax(logits, temperature, hard=False):
     """
     logits: [batch_size, n_classes], unnormalized log-probs
-    temperature: non-negative scalar
+    temperature: positive scalar
     hard: if True, take argmax, but differentiate w.r.t. soft sample y
     """
     y = gumbel_softmax_sample(logits, temperature)

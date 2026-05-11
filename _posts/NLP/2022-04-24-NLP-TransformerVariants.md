@@ -2,7 +2,7 @@
 layout: post
 title: "Transformer模型优化及加速概览"
 subtitle: ""
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/NLP/Taxonomy_of_Transformer_models.jpg"
 header-mask: 0.4
 mathjax: true
@@ -17,7 +17,7 @@ tags:
 ## 模型复杂度
 ### 模型参数
 &emsp;&emsp;Transformer 模型可学习参数主要由 embedding matrix，attention 模块两部分组成。Embedding matrix 主要由词表大小$V$及隐层维度$H$决定，总参数量为$V\times H$。  
-&emsp;&emsp;对于 Attention 模块的注意力部分，假设注意力头数为$A$。维度为$H$的输入经过矩阵$Q$，$K$及$V$的变换得到对应的 query, key, value 向量表征，这里一个头的$Q$，$K$，$V$维度为$H * \frac{H}{A}$，将多个头的参数合并（实际中通过reshape来实现），则$Q$，$K$，$V$维度均为$H\times H$。自注意力的输出会经过一个投影层，模块的输出维度不变，所以这部分参数为$H\times H$。所以注意力模块的参数数量为$4\times H\times H=4\times H^2$。  
+&emsp;&emsp;对于 Attention 模块的注意力部分，假设注意力头数为$A$，单头维度为$d_k=H/A$。每个头的$Q$，$K$，$V$投影参数维度为$H\times d_k$，所有头合并后，每个投影矩阵的总参数量为$H\times H$。自注意力的输出会经过一个投影层，模块的输出维度不变，所以这部分参数为$H\times H$。所以注意力模块的参数数量为$4\times H\times H=4\times H^2$。  
 &emsp;&emsp;Attention部分的输出会经过两层 MLP，输入维度为$H$，中间维度为$4\times H$，则两层 MLP 的总参数量为：$2 \times H\times 4H=8\times H^2$。总的一个 Attention模块的参数为$12\times H^2$。
 
 &emsp;&emsp;假设Transformer的模块层数为$L$，那么模型总的参数量为$V\times H + L\times12\times H^2$
@@ -25,9 +25,9 @@ tags:
 ### 计算复杂度
 &emsp;&emsp;Transformer 模型的计算/空间复杂度主要由其注意力模块来决定，这也是模型的瓶颈所在。注意力计算公式：
 $$
-{\rm{Softmax}} (QK^T)V
+\operatorname{Softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
 $$
-&emsp;&emsp;根据上式，若序列长度为$N$，由于每个 token 都需要与所有 token 计算相似性，所以光$QK^T$这项做矩阵乘的复杂度为$N\times H\times H\times N$，即为平方复杂度${\rm O}(N^2)$。
+&emsp;&emsp;根据上式，若序列长度为$N$，由于每个 token 都需要与所有 token 计算相似性，所以$QK^\top$这项矩阵乘的复杂度为$O(N^2H)$，注意力矩阵本身的空间复杂度为$O(N^2)$。
 
 ## 优化加速方法
 &emsp;&emsp;目前有许多针对 Transformer 的优化，用于处理更长的序列，减少内存占用或加速推理。其中四种常见的方法有：  
@@ -76,7 +76,7 @@ $$
 ![稀疏注意力模式](/img/NLP/sparse_attention_patterns.png) 
 
 #### 2.1 Longformer
-&emsp;&emsp;[Longformer](https://arxiv.org/abs/2004.05150) 使用了多种稀疏注意力模式：它在与序列程度成线性关系的同时，将局部（sliding window attention）与全局（global attention）信息结合了起来。在每个注意力层中，复杂度从${\rm O}(N^2)$减少到${\rm O}(N\times W)$。其中$N$为输入长度而$W$为窗口大小。  
+&emsp;&emsp;[Longformer](https://arxiv.org/abs/2004.05150) 使用了多种稀疏注意力模式：它在复杂度与序列长度成线性关系的同时，将局部（sliding window attention）与全局（global attention）信息结合了起来。在每个注意力层中，复杂度从$O(N^2)$减少到$O(N\times W)$。其中$N$为输入长度而$W$为窗口大小。  
 ![Longformer](/img/NLP/Longformer.png) 
 
 #### 2.2 Big Bird
@@ -88,12 +88,12 @@ $$
 &emsp;&emsp;[Routing Transformer](https://arxiv.org/abs/2003.05997)的想法是学习动态稀疏注意力模式，避免分配计算和内存来关注与感兴趣的 query 无关的内容。它利用 k-means 聚类来聚类 query 和 keys，因此每个 query 仅关注属于同一个 cluster 的 keys 来创建其稀疏性。
 
 #### 2.4 Reformer
-&emsp;&emsp;[Reformer](https://arxiv.org/abs/2001.04451)引入了多种全新的技术，比如 multi-round LSH attention 以及 reservable transformer。与 Routing Transformer 使用 k-means 聚类来减少注意力范围并创建稀疏性的方法类似，Reformer 使用一个基于哈希的相似性度量（multi-round Locality Sensitive Hashing）来高效准确地实现 token 分桶并将它们切块成同样大小来方便并行计算。Reformer 声称可以在单处理器上，仅使用16 GB内存就处理长达一百万词的上下文窗口。总的来说，Reformer 使用的用来减少计算复杂度与内存空间的两个关键技术：  
-- Locality Sensitive Hashing（LSH）用来减少关注长序列的复杂性，将复杂度从${\rm O}(N^2)$减少到${\rm O}(N\log N)$
+&emsp;&emsp;[Reformer](https://arxiv.org/abs/2001.04451)引入了多种全新的技术，比如 multi-round LSH attention 以及 reversible transformer。与 Routing Transformer 使用 k-means 聚类来减少注意力范围并创建稀疏性的方法类似，Reformer 使用一个基于哈希的相似性度量（multi-round Locality Sensitive Hashing）来高效准确地实现 token 分桶并将它们切块成同样大小来方便并行计算。Reformer 声称可以在单处理器上，仅使用16 GB内存就处理长达一百万词的上下文窗口。总的来说，Reformer 使用的用来减少计算复杂度与内存空间的两个关键技术：  
+    - Locality Sensitive Hashing（LSH）用来减少关注长序列的复杂性，将复杂度从$O(N^2)$减少到$O(N\log N)$
 - Reversible Residual Layers 被用来更高效地利用内存，使得内存不再与层数成线性关系
 
 ![Longformer](/img/NLP/Reformer.png) 
-&emsp;&emsp;理论上，LSH可以帮助减少复杂度为${\rm O}(N\log N)$，但实际中，Reformer只有对输入长度>2048的情况才会显现出收益。此外，multi-round LSH attention 也添加了额外的操作，从而造成了性能下降。  
+&emsp;&emsp;理论上，LSH可以帮助将复杂度降为$O(N\log N)$，但实际中，Reformer通常只有在输入长度大于2048时才会显现出收益。此外，multi-round LSH attention 也添加了额外的操作，从而造成了性能下降。  
 
 #### 2.5 Sparse Attention 局限性
 &emsp;&emsp;稀疏注意力也有其局限性：  
@@ -115,8 +115,8 @@ $$
 - 可以使用如 max/mean pooling 或者卷积等其它投影方法  
 
 #### 3.2 Performer
-&emsp;&emsp;[Performer](https://arxiv.org/abs/2009.14794) 在不显式地计算$N\times N$自注意力矩阵的情况下来近似注意力。同类方法还有 [Linear Transformer](https://arxiv.org/abs/2006.16236)，[RFA](https://arxiv.org/abs/2103.02143)（Random Feature Attention），[Nyströmformer](https://arxiv.org/ab1s/2102.03902) 使用近似方法来简化 QKV 注意力矩阵计算。  
-&emsp;&emsp;相比于原始注意力矩阵，Performer 首先首先逼近较低秩的随机 Q 和 K 矩阵，然后使用矩阵关联属性以不同的顺序计算最终的注意力。即相比于先做 QK 乘结果再与 V 乘，先做 KV 乘结果再与 Q 乘。
+&emsp;&emsp;[Performer](https://arxiv.org/abs/2009.14794) 在不显式地计算$N\times N$自注意力矩阵的情况下来近似注意力。同类方法还有 [Linear Transformer](https://arxiv.org/abs/2006.16236)，[RFA](https://arxiv.org/abs/2103.02143)（Random Feature Attention），[Nyströmformer](https://arxiv.org/abs/2102.03902) 使用近似方法来简化 QKV 注意力矩阵计算。  
+&emsp;&emsp;相比于原始注意力矩阵，Performer 首先逼近较低秩的随机 Q 和 K 矩阵，然后使用矩阵结合律以不同的顺序计算最终的注意力。即相比于先做 QK 乘结果再与 V 乘，先做 KV 乘结果再与 Q 乘。
 
 ![Linformer](/img/NLP/Performer.jpg)  
 
@@ -161,5 +161,5 @@ $$
 - 对 LayerNorm 和 Softmax 进行批处理，使它们更适合并行计算
 - 引入了模型感知分配器，以确保在可变长度请求服务期间内存占用较小  
 
-&emsp;&emsp;Turbo Transformer 的实现与 Pytorch、Tensorflow 和 Faster Transformers 相比，Turbo Transformer 总的来说实现了更高的 QPS/throughput。  
-&emsp;&emsp;就固定长度的输入来说，Turbo Transformer 的 runtime 大约比 XLA 和 ONNXruntime 快10%，但比 Faster Transformers 和 TensorRT 要慢越10%。因为 TensorRT 需要offline tuning 过程，在此期间它可以为 GEMM kernel 选择最优参数且可能识别出对于非 GEMM kernel 来说最优的 CUDA 线程块大小。
+&emsp;&emsp;Turbo Transformer 的实现与 PyTorch、TensorFlow 和 FasterTransformer 相比，总的来说实现了更高的 QPS/throughput。  
+&emsp;&emsp;就固定长度的输入来说，Turbo Transformer 的 runtime 大约比 XLA 和 ONNXruntime 快10%，但比 FasterTransformer 和 TensorRT 慢约10%。因为 TensorRT 需要 offline tuning 过程，在此期间它可以为 GEMM kernel 选择最优参数且可能识别出对于非 GEMM kernel 来说最优的 CUDA 线程块大小。

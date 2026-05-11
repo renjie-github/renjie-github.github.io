@@ -2,7 +2,7 @@
 layout: post
 title: "少样本学习"
 subtitle: "Few-shot Learning"
-author: "Roger"
+author: "Jie Ren"
 header-img: "img/Few-shot-Learning.png"
 header-mask: 0.4
 mathjax: true
@@ -18,13 +18,13 @@ tags:
 ### Siamese Network
 &emsp;&emsp;有两种训练Siamese Network的方法：
 1. Pairwise Similarity Score  
-  &emsp;&emsp;一种是每次取两个样本，计算二者之间的相似度。样本从数据集中构建，每次随机从同一类别中选择两个样本，标签为1；每次从不同的两个类别中随机各取一个样本，标签为0。以图片为例，训练时，两张图片经过**同一个**CNN提取特征$h_1$，$h_2$，在计算二者的绝对误差$z=\|h_1-h_2\|$，再将$z$经过Dense层，以Sigmoid激活函数输出，用标签计算损失函数。  
+  &emsp;&emsp;一种是每次取两个样本，计算二者之间的相似度。样本从数据集中构建，每次随机从同一类别中选择两个样本，标签为1；每次从不同的两个类别中随机各取一个样本，标签为0。以图片为例，训练时，两张图片经过**同一个**CNN提取特征$h_1$，$h_2$，再计算二者的绝对误差$z=\|h_1-h_2\|$，再将$z$经过Dense层，以Sigmoid激活函数输出，用标签计算损失函数。  
 
 2. Triplet Loss
-  &emsp;&emsp;每次从训练集中选择三个样本，其中两个属于同一类（anchor样本 + 正样本），另一个样本与前两个样本属于不同类（负样本）。以图片为例，训练时，三张图片经过**同一个**CNN提取特征，然后分别计算anchor样本与正样本的特征向量之间距离的2范数的平方$d^+$，以及anchor样本与负样本的特征向量之间距离的2范数的平方$d^-$。如果训练有效，应使得$d^+$尽量小，$d^-$尽量大。定义一个超参数margin：$\alpha$。如果$d^-\ge d^++\alpha$，则认为样本分类正确，loss为0，否则loss为$d^++\alpha-d^-$。综上，定义损失函数（triplet loss）为：$max\lbrace0,d^++\alpha-d^-\rbrace$，利用梯度下降来更新网络参数。
+  &emsp;&emsp;每次从训练集中选择三个样本，其中两个属于同一类（anchor样本 + 正样本），另一个样本与前两个样本属于不同类（负样本）。以图片为例，训练时，三张图片经过**同一个**CNN提取特征，然后分别计算anchor样本与正样本的特征向量之间距离的2范数的平方$d^+$，以及anchor样本与负样本的特征向量之间距离的2范数的平方$d^-$。如果训练有效，应使得$d^+$尽量小，$d^-$尽量大。定义一个超参数margin：$\alpha$。如果$d^-\ge d^++\alpha$，则认为样本分类正确，loss为0，否则loss为$d^++\alpha-d^-$。综上，定义损失函数（triplet loss）为：$\max\{0,d^++\alpha-d^-\}$，利用梯度下降来更新网络参数。
 
-### Pretraining & Fine Tuning  
-  &emsp;&emsp;以Siamese Network或其他监督学习的方法预训练一个神经网络，这样，给定一个样本便能得到其对应的embedding特征向量。使用时，对于support set中每一类中的样本，分别计算得到特征向量，然后对该类中样本的特征向量取平均得到该类的特征向量均值。最后，用query的特征向量分别与各类的特征向量均值进行对比（将各类的特征向量均值拼成一个矩阵，再与query的特征向量做矩阵乘），对比方式可以是余弦相似度等指标，经过softmax输出概率。  
+### Prototype-based Classification  
+  &emsp;&emsp;以Siamese Network、Prototypical Network或其他监督学习的方法预训练一个神经网络，这样，给定一个样本便能得到其对应的embedding特征向量。使用时，对于support set中每一类中的样本，分别计算得到特征向量，然后对该类中样本的特征向量取平均得到该类的特征向量均值（prototype）。最后，用query的特征向量分别与各类prototype进行对比（将各类prototype拼成一个矩阵，再与query的特征向量做矩阵乘），对比方式可以是余弦相似度等指标，经过softmax输出概率。  
   &emsp;&emsp;在预训练的基础上，使用support set中的样本，通过最小化预测结果与label之间的交叉熵来进行fine-tuning，以调节参数矩阵$W$和偏置$b$。这里参数矩阵$W$初始化为预训练得到的各类特征向量均值拼接成的矩阵，偏置$b$初始化为全0向量。  
   &emsp;&emsp;因为support set中的样本量很少，所以需要加正则化来防止过拟合。这里用熵正则（即所有query样本输出概率entropy的均值）比较好，entropy loss部分越小，说明模型对于自己的判断越“确信”。  
   &emsp;&emsp;模型的最终输出为一个Softmax分类器：  
@@ -49,7 +49,6 @@ tags:
   $$
   \text{sim}(w,q)=\frac{w^Tq}{\lVert w\rVert_2\cdot\lVert q\rVert_2} \tag{3}
   $$
-
 
 
 
